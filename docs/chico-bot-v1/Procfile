@@ -1,0 +1,4 @@
+# ChicoBot - Procfile pour Heroku/Render
+
+worker: python main.py
+web: python main.py

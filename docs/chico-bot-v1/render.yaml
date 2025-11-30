@@ -1,0 +1,33 @@
+# Render Configuration pour ChicoBot
+
+services:
+  # Service Web (si nécessaire pour les webhooks)
+  - type: web
+    name: chico-bot-web
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python main.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: ENVIRONMENT
+        value: production
+
+  # Service Worker (bot principal)
+  - type: worker
+    name: chico-bot-worker
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python main.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: ENVIRONMENT
+        value: production
+
+# Configuration de la base de données (optionnel)
+databases:
+  - name: chico-bot-db
+    plan: free

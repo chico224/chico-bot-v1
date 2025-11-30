@@ -1,0 +1,18 @@
+# ChicoBot - Configuration systemd pour Linux
+
+[Unit]
+Description=ChicoBot - Bot Telegram 100% Autonome pour la Guinée
+After=network.target
+
+[Service]
+Type=simple
+User=chico-bot
+WorkingDirectory=/opt/chico-bot
+Environment=ENVIRONMENT=production
+Environment=PYTHONPATH=/opt/chico-bot
+ExecStart=/usr/bin/python3 /opt/chico-bot/main.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

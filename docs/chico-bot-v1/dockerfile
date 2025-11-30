@@ -1,0 +1,38 @@
+# ChicoBot - Dockerfile pour déploiement universel
+
+FROM python:3.11-slim
+
+# Configuration de l'environnement
+ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=1
+ENV ENVIRONMENT=production
+
+# Création du répertoire de l'application
+WORKDIR /app
+
+# Installation des dépendances système
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copie des fichiers de configuration
+COPY requirements.txt .
+
+# Installation des dépendances Python
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copie de l'application
+COPY . .
+
+# Création du répertoire de données
+RUN mkdir -p /app/data
+
+# Permissions
+RUN chmod +x /app/main.py
+
+# Port d'exposition (pour les webhooks si nécessaire)
+EXPOSE 8000
+
+# Commande de démarrage
+CMD ["python", "main.py"]

@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  chico-bot:
+    build: .
+    container_name: chico-bot-guinea
+    restart: unless-stopped
+    environment:
+      - ENVIRONMENT=production
+      - PYTHONPATH=/app
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    networks:
+      - chico-network
+
+networks:
+  chico-network:
+    driver: bridge
+
+volumes:
+  chico-data:
+    driver: local
