@@ -201,11 +201,6 @@ python src/services/fortress_security.py
 - **Calcul automatique** : Au début de chaque mois
 - **Dashboard complet** : Statistiques et performances
 
-### Quiz Admin :
-1. *Quel est le nom de ta mère ?* → "Laouratou sow"
-2. *Quel est le nom de ton père ?* → "Ibrahime sorry sow" ou "Oumar barry"
-3. *Quel est ton but dans la vie ?* → "rendre fière la famille"
-
 ## 🌍 Impact Guinée
 
 ### Vision ChicoBot :
@@ -243,3 +238,4 @@ Ce projet est sous licence MIT - voir le fichier LICENSE pour les détails.
 ❤️ *Tu ne changes pas seulement ta vie. Tu changes la Guinée.* ❤️
 
 🚀 **Rejoins la Chico Family aujourd'hui !** 🚀
+
