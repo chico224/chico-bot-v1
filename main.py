@@ -15,6 +15,12 @@ Fonctionnalités principales :
 import asyncio
 import logging
 import os
+import sys
+from pathlib import Path
+
+# Fix universel pour déploiements (Render, Railway, Docker, etc.)
+# Ajoute le dossier du projet au PATH Python
+sys.path.insert(0, str(Path(__file__).parent))
 from contextlib import suppress
 
 from aiogram import Bot, Dispatcher
@@ -204,3 +210,4 @@ if __name__ == "__main__":
         logger.info("🛑 Arrêt manuel de ChicoBot")
     except Exception as e:
         logger.error(f"❌ Erreur fatale: {e}")
+
