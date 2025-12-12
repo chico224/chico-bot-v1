@@ -11,22 +11,26 @@ Fonctionnalités principales :
 
 🇬🇳 De la Guinée vers l'indépendance financière 🇬🇳
 """
-
 import asyncio
 import logging
 import os
 import sys
 from pathlib import Path
 
-# Fix universel pour déploiements (Render, Railway, Docker, etc.)
-# Ajoute le dossier du projet au PATH Python
-sys.path.insert(0, str(Path(__file__).parent))
-from contextlib import suppress
+# =====================================================
+# FIX UNIVERSEL – MARCHE PARTOUT (Koyeb, Render, Railway, local, etc.)
+# Ajoute le dossier du projet au PATH Python → plus jamais ModuleNotFoundError
+# =====================================================
+BASE_DIR = Path(__file__).resolve().parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
 
+from contextlib import suppress
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 
+# Import après le fix du PATH
 from config.settings import settings
 from core.database import database
 from core.logging_setup import get_logger
@@ -70,42 +74,42 @@ background_tasks = []
 async def main():
     """Fonction principale du bot."""
     global is_running, background_tasks
-    
+
     try:
         logger.info("🇬🇳 Démarrage de ChicoBot... 🇬🇳")
-        
+
         # Initialisation de la base de données
         logger.info("📊 Initialisation de la base de données...")
         await database.initialize()
-        
+
         # Initialisation des services
         logger.info("🔧 Initialisation des services...")
-        
+
         # Initialisation du système de communauté
         community_success = await initialize_community_manager()
         if not community_success:
             logger.error("❌ Échec initialisation système communauté")
             return
-        
+
         # Initialisation du système de sécurité
         security_success = await fortress_security.initialize()
         if not security_success:
             logger.error("❌ Échec initialisation système de sécurité")
             return
-        
+
         # Initialisation du système admin
         admin_success = await admin_system.initialize()
         if not admin_success:
             logger.error("❌ Échec initialisation système admin")
             return
-        
+
         bounty_success = await bounty_service.initialize()
         trading_success = await trading_engine.initialize()
         investment_success = await investment_engine.initialize()
         foundation_success = await chico_foundation.initialize()
         academy_success = await chico_academy.initialize()
-        
-        logger.info(f"🛡️ Fortress Security: {'✅' if fortress_success else '❌'}")
+
+        logger.info(f"🛡️ Fortress Security: {'✅' if security_success else '❌'}")
         logger.info(f"🏹 Bounty Service: {'✅' if bounty_success else '❌'}")
         logger.info(f"📈 Trading Engine: {'✅' if trading_success else '❌'}")
         logger.info(f"💎 Investment Engine: {'✅' if investment_success else '❌'}")
@@ -113,31 +117,26 @@ async def main():
         logger.info(f"🎓 Chico Academy: {'✅' if academy_success else '❌'}")
         logger.info(f"👑 Admin System: {'✅' if admin_success else '❌'}")
         logger.info(f"🎉 Community System: {'✅' if community_success else '❌'}")
-        
-        if not (fortress_success and bounty_success and trading_success and investment_success and foundation_success and academy_success and admin_success and community_success):
+
+        if not all([security_success, bounty_success, trading_success, investment_success,
+                    foundation_success, academy_success, admin_success, community_success]):
             return
-        
+
         logger.info("🎉 Tous les services initialisés avec succès")
-        
-        # Enregistrer les handlers IA (après initialisation)
+
+        # Enregistrer les handlers IA
         await register_ai_handlers(dp)
         logger.info("🤖 Système IA intégré avec succès")
-        
+
         # Démarrer les tâches de fond
         logger.info("🔄 Démarrage des tâches de fond...")
-        
-        # Tâches de fond pour les services de gains
         bounty_task = asyncio.create_task(bounty_service.run_bounty_hunter())
-        background_tasks.append(bounty_task)
-        
         trading_task = asyncio.create_task(trading_engine.run_trading())
-        background_tasks.append(trading_task)
-        
         investment_task = asyncio.create_task(investment_engine.run_investment())
-        background_tasks.append(investment_task)
-        
+        background_tasks.extend([bounty_task, trading_task, investment_task])
+
         logger.info("🔄 Tâches de fond démarrées")
-        
+
         # Message de démarrage légendaire
         startup_message = (
             "🇬🇳 **CHICOBOT EST EN LIGNE !** 🇬🇳\n\n"
@@ -154,38 +153,31 @@ async def main():
             "🇬🇳 *Prêt à transformer la Guinée ?* 🇬🇳\n\n"
             "🎯 *Utilise /start pour commencer l'aventure !*"
         )
-        
         logger.info(startup_message.replace('**', '').replace('*', ''))
-        
-        # Démarrer le polling
+
         is_running = True
         logger.info("🤖 Bot en attente des messages...")
-        
         await dp.start_polling(bot)
-        
+
     except Exception as e:
-        logger.error(f"❌ Erreur critique dans main(): {e}")
-        
+        logger.error(f"❌ Erreur critique dans main(): {e}", exc_info=True)
+
     finally:
-        # Nettoyage
         await shutdown()
 
 async def shutdown():
     """Arrêt propre du bot."""
     global is_running, background_tasks
-    
+
     try:
         logger.info("🛑 Arrêt de ChicoBot...")
-        
         is_running = False
-        
-        # Annuler les tâches de fond
+
         for task in background_tasks:
             with suppress(Exception):
                 task.cancel()
                 await task
-        
-        # Arrêter les services
+
         await fortress_security.shutdown()
         await trading_engine.shutdown()
         await investment_engine.shutdown()
@@ -194,12 +186,10 @@ async def shutdown():
         await chico_academy.shutdown()
         await admin_system.shutdown()
         await shutdown_community_manager()
-        
-        # Fermer la session bot
+
         await bot.session.close()
-        
         logger.info("✅ ChicoBot arrêté avec succès")
-        
+
     except Exception as e:
         logger.error(f"❌ Erreur lors de l'arrêt: {e}")
 
@@ -209,5 +199,4 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         logger.info("🛑 Arrêt manuel de ChicoBot")
     except Exception as e:
-        logger.error(f"❌ Erreur fatale: {e}")
-
+        logger.error(f"❌ Erreur fatale: {e}", exc_info=True)
