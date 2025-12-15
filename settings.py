@@ -31,8 +31,8 @@ class Settings(BaseModel):
     telegram_admin_chat_id: int = Field(..., alias="TELEGRAM_ADMIN_CHAT_ID")
     
     # Configuration Base de Données
-    database_url: str = Field("sqlite:///chicobot.db", alias="DATABASE_URL")
-    database_pool_size: int = Field(10, alias="DATABASE_POOL_SIZE")
+    DATABASE_URL: str = Field("sqlite:///chicobot.db", alias="DATABASE_URL")
+    LOG_LEVEL: int = Field(10, alias="DATABASE_POOL_SIZE")
     
     # Configuration APIs Externes
     serpapi_key: Optional[str] = Field(None, alias="SERPAPI_KEY")
@@ -80,3 +80,4 @@ class Settings(BaseModel):
 
 # Instance globale des settings - Pydantic V2
 settings = Settings()
+
